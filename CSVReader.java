@@ -67,3 +67,42 @@ public class Teste {
         }
         return data;
     }
+
+    public String generateHTMLTable(List<Horario> horarios) {
+        StringBuilder htmlContent = new StringBuilder();
+        htmlContent.append("<html lang='en' xmlns='http://www.w3.org/1999/xhtml'>");
+        htmlContent.append("<body><table border='1'>");
+
+        if (horarios.isEmpty()) {
+            htmlContent.append("<tr><td colspan='5'>The CSV file is empty or does not exist.</td></tr>");
+        } else {
+            htmlContent.append("<script type='text/javascript' src='https://unpkg.com/tabulator-tables@4.8.4/dist/js/tabulator.min.js'></script>");
+            for (Horario h : horarios) {
+                htmlContent.append("<tr>");
+                htmlContent.append("<td>").append(h).append("</td>");
+                htmlContent.append("</tr>");
+            }
+        }
+
+        htmlContent.append("</table></body></html>");
+        return htmlContent.toString();
+    }
+
+    public void displayHTMLContent(String htmlContent) {
+        editorPane.setText(htmlContent);
+        return;
+    }
+
+    public void saveHTMLToFile(String htmlContent, File destinationFile) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(destinationFile))) {
+            writer.write(htmlContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new CSVReader());
+    }
+
+}
