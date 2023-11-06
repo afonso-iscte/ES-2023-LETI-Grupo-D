@@ -1,10 +1,10 @@
 package projeto_es;
 
-public class Turma {
+public class Unidade_Curricular {
 
 	private String name;
 	
-	public Turma(String name) {
+	public Unidade_Curricular(String name) {
 		this.name = name;
 	}
 	
