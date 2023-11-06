@@ -8,29 +8,27 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Teste {
+public class CSVReader {
 	
     private JFrame frame;
     private JButton openButton;
     private JEditorPane editorPane;
 
-    public Teste() {
+    public CSVReader() {
         frame = new JFrame("Leitor CSV");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        openButton = new JButton("Abrir Ficheiro CSV");
+        openButton = new JButton("Abrir ficheiro CSV");
         openButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(null);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-                    List<Horario> data = readCSV(filePath);
+                    List<String[]> data = readCSV(filePath);
                     String htmlContent = generateHTMLTable(data);
                     displayHTMLContent(htmlContent);
-
-                    // Ask user to choose the file destination for saving the HTML file
                     int saveValue = fileChooser.showSaveDialog(null);
                     if (saveValue == JFileChooser.APPROVE_OPTION) {
                         saveHTMLToFile(htmlContent, fileChooser.getSelectedFile());
@@ -49,18 +47,14 @@ public class Teste {
         frame.setSize(1000,400); 
         frame.setVisible(true);
     }
-    public List<Horario> readCSV(String filePath) {
-        List<Horario> data = new ArrayList<>();
+
+    public List<String[]> readCSV(String filePath) {
+        List<String[]> data = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split(",");
-                Horario h = new Horario(new Curso(values[0]), new Unidade_Curricular(values[1]), 
-                						new Turno(values[2]),new Turma(values[3]), 
-                						Integer.parseInt(values[4]), new Day(values[5]),
-                						new Time(values[6],values[7]), new Date(values[8]), 
-                						values[9],new Sala(values[10]));
-                data.add(h);
+                data.add(values);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,18 +62,20 @@ public class Teste {
         return data;
     }
 
-    public String generateHTMLTable(List<Horario> horarios) {
+    public String generateHTMLTable(List<String[]> data) {
         StringBuilder htmlContent = new StringBuilder();
-        htmlContent.append("<html lang='en' xmlns='http://www.w3.org/1999/xhtml'>");
+        htmlContent.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">");
+        htmlHeader(htmlContent);
+        //makeJavaScript(htmlContent);
         htmlContent.append("<body><table border='1'>");
-
-        if (horarios.isEmpty()) {
-            htmlContent.append("<tr><td colspan='5'>The CSV file is empty or does not exist.</td></tr>");
+        if (data.isEmpty()) {
+            htmlContent.append("<tr><td colspan='5'>O ficheiro esta vazio ou nao existe</td></tr>");
         } else {
-            htmlContent.append("<script type='text/javascript' src='https://unpkg.com/tabulator-tables@4.8.4/dist/js/tabulator.min.js'></script>");
-            for (Horario h : horarios) {
+            for (String[] row : data) {
                 htmlContent.append("<tr>");
-                htmlContent.append("<td>").append(h).append("</td>");
+                for (String value : row) {
+                    htmlContent.append("<td>").append(value).append("</td>");
+                }
                 htmlContent.append("</tr>");
             }
         }
@@ -88,9 +84,20 @@ public class Teste {
         return htmlContent.toString();
     }
 
-    public void displayHTMLContent(String htmlContent) {
+    private void htmlHeader(StringBuilder htmlContent) {
+    	htmlContent.append("\n");
+		htmlContent.append("<head>");
+		
+		htmlContent.append("<meta charset='utf-8' />");
+		htmlContent.append("<link href=\"https://unpkg.com/tabulator-tables@4.8.4/dist/css/tabulator.min.css\" rel=\"stylesheet\">");
+		htmlContent.append("<script type=\"text/javascript\" src=\"https://unpkg.com/tabulator-tables@4.8.4/dist/js/tabulator.min.js\"></script>");
+
+		htmlContent.append("</head>");	
+	}
+
+
+	public void displayHTMLContent(String htmlContent) {
         editorPane.setText(htmlContent);
-        return;
     }
 
     public void saveHTMLToFile(String htmlContent, File destinationFile) {
@@ -104,5 +111,5 @@ public class Teste {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new CSVReader());
     }
-
+    
 }
