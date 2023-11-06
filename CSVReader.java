@@ -49,3 +49,21 @@ public class Teste {
         frame.setSize(1000,400); 
         frame.setVisible(true);
     }
+    public List<Horario> readCSV(String filePath) {
+        List<Horario> data = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+                Horario h = new Horario(new Curso(values[0]), new Unidade_Curricular(values[1]), 
+                						new Turno(values[2]),new Turma(values[3]), 
+                						Integer.parseInt(values[4]), new Day(values[5]),
+                						new Time(values[6],values[7]), new Date(values[8]), 
+                						values[9],new Sala(values[10]));
+                data.add(h);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
